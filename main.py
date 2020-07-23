@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+import sys # for comand line options
 
 from dbManager import SqLiteDB
 from preprocessor import Preproc
@@ -9,9 +10,9 @@ from graddesc import GradientDescent
 
 def main():
    
-   dbms = SqLiteDB(SqLiteDB.SQLITE,dbpath='..//data//july 7//', dbname='july7data.sqlite')
+   dbms = SqLiteDB(SqLiteDB.SQLITE,dbpath=dbpath, dbname=dbname)
     # C.1_2TAG-4ANC F.1_2TAG-4ANC F.2_2TAG-4ANC C.1_2TAG-4ANC C.1_2TAG-4ANC
-   dbms.TABLE = "F.1_2TAG-4ANC"
+   dbms.TABLE = tablename
    query = "SELECT Time, D20C, CC90, \"9028\", \"198A\" FROM '{TABLENAME}'".format(TABLENAME=dbms.TABLE)
    df = dbms.get_all_data(query=query,table=dbms.TABLE)
    # Remove PK_UID column
@@ -86,7 +87,7 @@ def main():
          ax.add_artist(circle2)
          ax.add_artist(circle3)
          ax.plot(anchor.x,anchor.y,'ro')
-         fig.show()
+         plt.show()
       
    #while (t < len(df)):
       dist = df[columns].iloc[t]
@@ -127,13 +128,24 @@ def main():
    ax.plot(anchor.x,anchor.y,'ro')
    ax.scatter(xlist, ylist, c="g", alpha=0.5, label="Final positions")
    ax.legend()
-   fig.show()
    plt.show()
 
 
 # Program entry point
 if __name__ == "__main__":
     print("init")
+    dbpath=""
+    dbname=""
+    
+    if len(sys.argv)>1:
+       dbpath=sys.argv[1]
+       dbname=sys.argv[2]
+       tablename=sys.argv[3]
+    else:
+       dbpath='..//data//july 20//'
+       dbname='july20data.sqlite'
+       tablename = "H.3_o_1T_4A"
+          
     columns = ["x", "y"]
     index  = ["D20C", "CC90", "9028", "198A"]
     anchor = pd.DataFrame(index=index, columns=columns)

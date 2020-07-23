@@ -27,7 +27,7 @@ class SqLiteDB:
         if dbtype in self.DB_ENGINE.keys():
             engine_url = self.DB_ENGINE[dbtype].format(DB=dbname)
             self.db_engine = create_engine(engine_url)
-            print(self.db_engine)
+            print("SQLite database: "+str(self.db_engine))
         else:
             print("DBType is not found in DB_ENGINE")
     
@@ -51,8 +51,8 @@ class SqLiteDB:
             except Exception as e:
                 print(e)
             else:
-                for row in result:
-                    print(row) # print(row[0], row[1], row[2])
+                #for row in result:
+                #    print(row) # print(row[0], row[1], row[2])
                 result.close()
         print("\n")
         table_df = pd.read_sql_table(
