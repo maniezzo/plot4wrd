@@ -1,27 +1,62 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import sys # for comand line options
 
-def main():
-    cv_df = pd.DataFrame(pd.read_csv(source_path + cv_file_name,
-                                     sep=',',
-                                     names=["Time", "TagID", "x", "y", "z", "Quality"],
-                                     header=None))
+def init_df(df):
+    df = df.replace('-', np.nan)
+    df.time = df.time.astype('datetime64[ns]')
+    df.x = df.x.astype(float)
+    df.y = df.y.astype(float)
+    df.z = df.z.astype(float)
+    df.quality = df.quality.astype(float)
+    # set time ad index of time series
+    df.set_index('time', inplace=True)
+    # fake distance
+    df['distance'] = df[['x','y']].mean(axis=1)
+    return df
 
-    uwb_df = pd.DataFrame(pd.read_csv(source_path + uwb_file_name,
-                                      sep='\n',
-                                      names=["Time"],
-                                      header=None))
-    
-    uwb_df = uwb_df[uwb_df['Time'].str.contains('0\)')==True]
-    uwb_df['Time'] = uwb_df['Time'].map(lambda x: x.replace('[','|')
+def parse_cv_data():
+    df = pd.DataFrame(pd.read_csv(source_path + cv_file_name,
+                                  sep=',',
+                                  names=['time', 'tagID', 'x', 'y', 'z', 'quality'],
+                                  header=None))
+    return init_df(df)
+
+def parse_uwb_data():
+    # takes data by row
+    df = pd.DataFrame(pd.read_csv(source_path + uwb_file_name,
+                                  sep='\n',
+                                  names=['time'],
+                                  header=None))
+    # keep only the lines that contain the 0) key string
+    df = df[df['time'].str.contains('0\)')==True]
+    # parse the various data contained in the key lines
+    df['time'] = df['time'].map(lambda x: x.replace('[','|')
                                         .replace(']','')
                                         .replace('0)','')
                                         .replace(',x0D','')
                                         .replace('   ','|')
                                         .replace(',','|')
                                         .replace('|','',1))
-    uwb_df[['Time', 'TagID', 'x', 'y', 'z', 'Quality']] = uwb_df.Time.str.split('|',expand=True)
+    df[['time', 'tagID', 'x', 'y', 'z', 'quality']] = df.time.str.split('|', expand=True)
+    return init_df(df)
+
+def main():    
+    cv_df = parse_cv_data()
+    uwb_df = parse_uwb_data()
+    
+    ax = plt.gca()
+    cv_df.plot(kind='line', y='distance', color='red', use_index=True, label='CV', ax=ax)
+    uwb_df.plot(kind='line', y='distance', color='blue', use_index=True, label='UWB', ax=ax)
+ 
+    """
+    # Prova fusione
+    df = pd.concat([cv_df, uwb_df])
+    df = df.sort_index()
+    
+    df.plot(kind='line', y='distance', color='red', use_index=True, label='Distances')
+    """
     
 # Program entry point
 if __name__ == "__main__":
@@ -38,15 +73,6 @@ if __name__ == "__main__":
        source_path='..//DataSet//20201022//201022_Test2//'
        cv_file_name='CV_L2_201022.txt'
        uwb_file_name='UWB_L2_201022.txt'
-       
-          
-    columns = ["x", "y"]
-    index  = ["D20C", "CC90", "9028", "198A"]
-    anchor = pd.DataFrame(index=index, columns=columns)
-    anchor.loc['D20C'].x=0; anchor.loc['D20C'].y=0; 
-    anchor.loc['CC90'].x=0; anchor.loc['CC90'].y=5; 
-    anchor.loc['9028'].x=4; anchor.loc['9028'].y=0; 
-    anchor.loc['198A'].x=4; anchor.loc['198A'].y=5; 
-    verbose = 1
+
     main()
     print("end")
