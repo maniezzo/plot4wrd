@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import sys # for comand line options
+import animate
 
 def init_df(df):
     df = df.replace('-', np.nan)
@@ -58,6 +59,13 @@ def main():
     df.plot(kind='line', y='distance', color='red', use_index=True, label='Distances')
     """
     
+    numpoints = len(cv_df)
+    # inverto x con y per fare la figura larga
+    y = cv_df.x
+    x = cv_df.y
+    a = animate.AnimatedScatter(numpoints,x,y)
+    plt.show()
+    
 # Program entry point
 if __name__ == "__main__":
     print("init")
@@ -70,7 +78,7 @@ if __name__ == "__main__":
        cv_file_name=sys.argv[2]
        uwb_file_name=sys.argv[3]
     else:
-       source_path='..//DataSet//20201022//201022_Test2//'
+       source_path='c://AAAToBackup//progetti//4wrd//data//20201022//201022_Test2//'
        cv_file_name='CV_L2_201022.txt'
        uwb_file_name='UWB_L2_201022.txt'
 
