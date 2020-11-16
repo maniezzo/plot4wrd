@@ -25,22 +25,30 @@ def parse_cv_data():
     return init_df(df)
 
 def parse_uwb_data():
-    # takes data by row
-    df = pd.DataFrame(pd.read_csv(source_path + uwb_file_name,
-                                  sep='\n',
-                                  names=['time'],
-                                  header=None))
     # keep only the lines that contain the 0) key string
-    df = df[df['time'].str.contains('0\)')==True]
-    # parse the various data contained in the key lines
-    df['time'] = df['time'].map(lambda x: x.replace('[','|')
-                                        .replace(']','')
-                                        .replace('0)','')
-                                        .replace(',x0D','')
-                                        .replace('   ','|')
-                                        .replace(',','|')
-                                        .replace('|','',1))
-    df[['time', 'tagID', 'x', 'y', 'z', 'quality']] = df.time.str.split('|', expand=True)
+    oldFormat = False
+    if(oldFormat):
+    # takes data by row
+       df = pd.DataFrame(pd.read_csv(source_path + uwb_file_name,
+                                     sep='\n',
+                                     names=['time'],
+                                     header=None))
+       df = df[df['time'].str.contains('0\)')==True]
+       # parse the various data contained in the key lines
+       df['time'] = df['time'].map(lambda x: x.replace('[','|')
+                                           .replace(']','')
+                                           .replace('0)','')
+                                           .replace(',x0D','')
+                                           .replace('   ','|')
+                                           .replace(',','|')
+                                           .replace('|','',1))
+       df[['time', 'tagID', 'x', 'y', 'z', 'quality']] = df.time.str.split('|', expand=True)
+    else:
+       df = pd.DataFrame(pd.read_csv(source_path + uwb_file_name,
+                                     sep=',',
+                                     names=['time', 'tagID', 'x', 'y', 'z', 'quality','nix'],
+                                  header=None))
+       df = df.drop(columns=['nix'])
     return init_df(df)
 
 def main():    
@@ -78,9 +86,9 @@ if __name__ == "__main__":
        cv_file_name=sys.argv[2]
        uwb_file_name=sys.argv[3]
     else:
-       source_path='c://AAAToBackup//progetti//4wrd//data//20201022//201022_Test2//'
-       cv_file_name='CV_L2_201022.txt'
-       uwb_file_name='UWB_L2_201022.txt'
+       source_path='c://AAAToBackup//progetti//4wrd//data//20201116//Test1//'
+       cv_file_name='CV_L2_201116.csv'
+       uwb_file_name='UWB_L2_201116.csv'
 
     main()
     print("end")
