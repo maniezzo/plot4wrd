@@ -69,6 +69,7 @@ def getAlfasInRange(rangeT):
     rangeAlfas = alfas[rangeT[0]:rangeT[len(rangeT)-1]]
     return rangeAlfas.mean(axis = 0, skipna = True) 
 
+# Calcolo delle singole sommatorie più interne del calcolo del gradiente
 def getXYGradient(sj, range_t):
     global d, antennas
     d_new = d[range_t[0]:range_t[len(range_t)-1]]
@@ -84,7 +85,7 @@ def getXYGradient(sj, range_t):
     res.y = resY.sum().values
     return res.T, resX, resY#.sum() #Sommo tutto (primo sum per colonna, secondo tutte le colonne tra loro)
 
-
+# Calcolo del gradiente
 def getGradient(sj, range_t):
     alfas = getAlfasInRange(range_t)
     x = 0
@@ -96,6 +97,7 @@ def getGradient(sj, range_t):
     
     return {'x': x, 'y': y}    
 
+# Calcolo dell'errore di sj
 def getError(sj, range_t):
     global d
     alfas = getAlfasInRange(range_t)
@@ -109,9 +111,8 @@ def getError(sj, range_t):
     for i in range(len(alfas)):
         error = error + alfas[i] * errors[i]
     return error
-    
-    
-    
+
+# Implementazione dello steepest descent
 def steepestDescent(sj, beta, range_t):
     Max_k1 = 1000
     Max_k2 = 500
@@ -133,7 +134,7 @@ def steepestDescent(sj, beta, range_t):
     
         #Step4
         #(abs(gradient['x']) < 0.021843564706984107 and abs(gradient['y'] < 0.1733691628329498)) or 
-        if (k1 > Max_k1):
+        if (k1 > Max_k1): #da usare anche la soglia quando si avranno gradienti sensati
             return sj, beta
         else:
             while step5:
@@ -234,22 +235,11 @@ if __name__ == "__main__":
             points = points.append({"x": 0, "y": 0}, ignore_index=True)
 
     numpoints = len(df)
-    # inverto x con y per fare la figura larga
-    #d.plot(kind='line', color='red', use_index=True, ax=ax)
-    #y = (5-dfmerged.x_1)
-    #x = dfmerged.y_1
+
     xfig = 16.5       # room length
     yfig = 5          # room width
-    #a = animate.AnimatedScatter(numpoints,x,y,xfig,yfig)
-
-    #dfmerged = pd.merge_ordered(df,df,on="time",suffixes=("_1","_2"), fill_method="ffill")
     fig, ax = plt.subplots(figsize=(xfig, yfig))
-    # ax.invert_yaxis()
-    #ax.scatter(points.y, 5-points.x, c="blue", label="points", edgecolors='none')
-    
-    #interpolationGC()
 
-    #interpolationEG()
     range_p0 = range(0,6)
     range_p1 = range(6,21)
     range_p2 = range(21,31)
@@ -257,6 +247,7 @@ if __name__ == "__main__":
     # alfas_in_range = getAlfasInRange(range(0,33))
     sj = {"x": 3,"y": 2}
     
+    #Decommentare sotto se si vuole vedere lo steepest in azione. NB con gradienti erronei non funziona
     # ax.scatter(sj['y'], sj['x'], c="red", label="points", edgecolors='none')
     # sj, beta = steepestDescent(sj, 1.1, range_p0)
     # ax.scatter(sj['y'], sj['x'], c="white", label="points", edgecolors='none')
@@ -264,6 +255,8 @@ if __name__ == "__main__":
     # ax.scatter(sj['y'], sj['x'], c="white", label="points", edgecolors='none')
     # sj, beta = steepestDescent(sj, beta, range_p2)
     # ax.scatter(sj['y'], sj['x'], c="blue", label="points", edgecolors='none')
+    
+    #Risultati dei vari alfa e dei gradienti e dell'errore nel range 0-33
     mediaAlfas = getAlfasInRange(range(0,33))
     
     singleGradient, singleGradientX, singleGradientY = getXYGradient(sj, range(0,33))
