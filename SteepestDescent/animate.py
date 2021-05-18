@@ -20,7 +20,7 @@ class AnimatedScatter(object):
                                            init_func=self.setup_plot, blit=True,
                                            frames=len(x)-1)
         # se interessa il filmino mp4
-        self.anim.save('scatter.mp4', writer='ffmpeg')
+        #self.anim.save('scatter.mp4', writer='ffmpeg')
         
 
     def data_stream(self, x=[], y=[]):
@@ -61,4 +61,4 @@ class AnimatedScatter(object):
 
         # return the updated artist to FuncAnimation
         # It expects a sequence of artists, thus the trailing comma.
-        return self.scat, # trailing comma NEEDED
+        return self.scat,
