@@ -61,21 +61,19 @@ def main():
     cv_df.plot(kind='line', y='distance', color='red', use_index=True, label='CV', ax=ax)
     uwb_df.plot(kind='line', y='distance', color='blue', use_index=True, label='UWB', ax=ax)
  
-    """
     # Prova fusione
     df = pd.concat([cv_df, uwb_df])
     df = df.sort_index()
     
     df.plot(kind='line', y='distance', color='red', use_index=True, label='Distances')
-    """
-    
+
     numpoints = len(dfmerged)
     # inverto x con y per fare la figura larga
     y = (5-dfmerged.x_1)
     x = dfmerged.y_1
     xfig = 16.5       # room length
     yfig = 5          # room width
-    a = animate.AnimatedScatter(numpoints,x,y,xfig,yfig)
+    #a = animate.AnimatedScatter(numpoints,x,y,xfig,yfig)
     plt.show()
     
 # Program entry point
