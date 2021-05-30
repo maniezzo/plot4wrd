@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import matplotlib.animation as animation
@@ -7,7 +8,7 @@ import matplotlib.animation as animation
 
 class AnimatedScatter(object):
     """Animated scatter plot using matplotlib.animations.FuncAnimation."""
-    def __init__(self, numtimes=50, df_full=[], xfig=16.5,yfig=5):
+    def __init__(self, numtimes=50, df_full=[], xfig=16.5,yfig=5,anchor=pd.DataFrame()):
         self.numtimes  = numtimes   # time instants of the simulation
         self.numpoints = 2          # num evolved poits
         self.colarray  = np.ones(2*numtimes)
@@ -25,12 +26,17 @@ class AnimatedScatter(object):
         self.fig, self.ax = plt.subplots(figsize=(xfig,yfig))
         img = plt.imread("../stanza.png")
         self.ax.imshow(img,zorder=0, extent=[0, xfig, 0, yfig])
+        name = 'scatter_NoNoise.mp4'
+        if not anchor.empty:
+            self.ax.plot(anchor.y, anchor.x, 'rD', markersize=12)
+            self.ax.annotate(anchor.name, (anchor.y, anchor.x), xytext=(anchor.y+0.25, anchor.x), fontsize=18)
+            name = 'scatter_'+anchor.name+'.mp4'
         # setup FuncAnimation.
         self.anim = animation.FuncAnimation(self.fig, self.update, interval=50, 
                                            init_func=self.setup_plot, blit=True,
                                            frames=self.numtimes-1)
         # se interessa il filmino mp4
-        self.anim.save('scatter.mp4', writer='ffmpeg')
+        self.anim.save(name, writer='ffmpeg')
        
         
     def data_stream_mono(self, x1=[], y1=[]):
