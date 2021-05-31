@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import sys     # for comand line options
 import animate # needs conda install fsspec
 from datetime import datetime, timedelta
+import noisegenerator as ng
 
 
 def plotStanza(xfig, yfig, anchor, df, fig=None):
@@ -18,119 +19,6 @@ def plotStanza(xfig, yfig, anchor, df, fig=None):
     ax.imshow(img, zorder=0, extent=[0, xfig, 0, yfig])
     plt.show()
     
-def moveNoise(noise_dir, qnt):
-    x1 = 0
-    y1 = 0
-    if 'bottom' in noise_dir:
-        x1 = qnt
-    elif 'top' in noise_dir:
-        x1 = -qnt
-    if 'right' in noise_dir:
-        y1 = qnt
-    elif 'left'  in noise_dir:
-        y1 = -qnt
-    return x1, y1
-    
-def generateNoise(period, noise_qnt, noise_dir):
-    noise_x = 0
-    noise_y = 0
-    if "2" in noise_qnt:
-        if noise_qnt == "low2medium" or noise_qnt == "medium2low":
-            x21 = 0.02
-            y21 = 0.02
-            x22 = 0.06
-            y22 = 0.05
-            x11, y11 = moveNoise(noise_dir, 0.1)
-            x12, y12 = moveNoise(noise_dir, 0.4)
-        elif noise_qnt == "medium2hight" or noise_qnt == "hight2medium":
-            x21 = 0.06
-            y21 = 0.05
-            x22 = 0.2
-            y22 = 0.1
-            x11, y11 = moveNoise(noise_dir, 0.4)
-            x12, y12 = moveNoise(noise_dir, 0.6)
-            
-        if noise_qnt == "low2medium" or noise_qnt == "medium2hight":
-            noise_x = np.concatenate((np.random.normal(x11, x21, period-round(period/2)), np.random.normal(x12, x22, round(period/2))))
-            noise_y = np.concatenate((np.random.normal(y11, y21, period-round(period/2)), np.random.normal(y12, y22, round(period/2))))
-        else:
-            noise_x = np.concatenate((np.random.normal(x12, x22, round(period/2)), np.random.normal(x11, x21, period-round(period/2))))
-            noise_y = np.concatenate((np.random.normal(y12, y22, round(period/2)), np.random.normal(y11, y21, period-round(period/2))))
-    elif noise_qnt != '':
-        if noise_qnt == 'low' or noise_qnt == 'lowR':
-            x2 = 0.02
-            y2 = 0.02
-            x1, y1 = moveNoise(noise_dir, 0.1)
-        elif noise_qnt == 'medium' or noise_qnt == 'mediumR':
-            x2 = 0.06
-            y2 = 0.05
-            x1, y1 = moveNoise(noise_dir, 0.4)
-        elif noise_qnt == 'hight' or noise_qnt == 'hightR':
-            x2 = 0.2
-            y2 = 0.1
-            x1, y1 = moveNoise(noise_dir, 0.6)
-                
-        noise_x = np.random.normal(x1, x2, period)
-        noise_y = np.random.normal(y1, y2, period)
-    return noise_x, noise_y
-
-def generateObliqueDistortion(noise_dir, noise_qnt):
-    from_pos_noise, to_pos_noise = 0, 0
-    if noise_dir == 'left':
-        if noise_qnt == 'low2medium':
-            from_pos_noise = 0
-            to_pos_noise = -0.2
-        elif noise_qnt == 'medium2low':
-            from_pos_noise = -0.2
-            to_pos_noise = 0
-        elif noise_qnt == 'medium2hight':
-            from_pos_noise = 0.3
-            to_pos_noise = -0.4
-        elif noise_qnt == 'hight2medium':
-            from_pos_noise = -0.4
-            to_pos_noise = 0.3
-    elif noise_dir == 'right':
-        if noise_qnt == 'low2medium':
-            from_pos_noise = -0.2
-            to_pos_noise = 0
-        elif noise_qnt == 'medium2low':
-            from_pos_noise = 0
-            to_pos_noise = -0.2
-        elif noise_qnt == 'medium2hight':
-            from_pos_noise = -0.4
-            to_pos_noise = 0.3
-        elif noise_qnt == 'hight2medium':
-            from_pos_noise = 0.3
-            to_pos_noise = -0.4
-    elif noise_dir == 'top-left':
-        if noise_qnt == 'low2medium' or noise_qnt == 'low':
-            from_pos_noise = 0
-            to_pos_noise = -0.2
-        elif noise_qnt == 'medium2low' or noise_qnt == 'lowR':
-            from_pos_noise = -0.2
-            to_pos_noise = 0
-        elif noise_qnt == 'medium2hight' or noise_qnt == 'medium' or noise_qnt == 'hight':
-            from_pos_noise = 0.3
-            to_pos_noise = -0.4
-        elif noise_qnt == 'hight2medium' or noise_qnt == 'mediumR' or noise_qnt == 'hightR':
-            from_pos_noise = -0.4
-            to_pos_noise = 0.3
-    elif noise_dir == 'top-right':
-        if noise_qnt == 'low2medium' or noise_qnt == 'low':
-            from_pos_noise = -0.2
-            to_pos_noise = 0
-        elif noise_qnt == 'medium2low' or noise_qnt == 'lowR':
-            from_pos_noise = 0
-            to_pos_noise = -0.2
-        elif noise_qnt == 'medium2hight' or noise_qnt == 'medium' or noise_qnt == 'hight':
-            from_pos_noise = -0.4
-            to_pos_noise = 0.3 
-        elif noise_qnt == 'hight2medium' or noise_qnt == 'mediumR' or noise_qnt == 'hightR':
-            from_pos_noise = 0.3
-            to_pos_noise = -0.4
-    
-    return from_pos_noise, to_pos_noise
-
  
 # simulation of staying still in one position for a certain period (in ms)
 def stay(position, milliseconds, noise_qnt, noise_dir):
@@ -144,7 +32,7 @@ def stay(position, milliseconds, noise_qnt, noise_dir):
     df.time = date_rng
     df.tagID = 'tag1'
     
-    noise_x, noise_y = generateNoise(period, noise_qnt, noise_dir)
+    noise_x, noise_y = ng.generateNoise(period, noise_qnt, noise_dir)
     
     df.x = position.x + noise_x
     df.y = position.y + noise_y
@@ -177,14 +65,14 @@ def move(from_pos, to_pos, milliseconds, noise_qnt, noise_dir):
     df.tagID = 'tag1'
     df.quality = 0
     
-    noise_x, noise_y = generateNoise(period, noise_qnt, noise_dir)
+    noise_x, noise_y = ng.generateNoise(period, noise_qnt, noise_dir)
     
     if from_pos.x == to_pos.x:
         df.x = from_pos.x + noise_x
         df.y = generatePositions(from_pos.y, to_pos.y, period) + noise_y
     else:
         if 'left' in noise_dir or 'right' in noise_dir:
-            from_pos_noise, to_pos_noise = generateObliqueDistortion(noise_dir, noise_qnt)
+            from_pos_noise, to_pos_noise = ng.generateObliqueDistortion(noise_dir, noise_qnt)
             df.y = generatePositions(from_pos.y + from_pos_noise, to_pos.y + to_pos_noise, period) + noise_y
         else:
             df.y = from_pos.y + noise_y
@@ -192,7 +80,8 @@ def move(from_pos, to_pos, milliseconds, noise_qnt, noise_dir):
         
     df.z = 0
     path_df=path_df.append(df, ignore_index=True)
-    
+ 
+# creates path of simulation with no noise
 def createPathNoNoise(animation):
     stay(positions.loc['Pos0'], 20, '', '')
     move(positions.loc['Pos0'], positions.loc['Pos1'], 60, '', '')
@@ -219,7 +108,8 @@ def createPathNoNoise(animation):
     
     if animation:
         a = animate.AnimatedScatter(len(path_df),path_df,xfig,yfig,pd.DataFrame())
-    
+
+# creates path of simulation with noise: pov CB1D antenna
 def createCB1DPath(animation):
     stay(positions.loc['Pos0'], 20, 'low', '')
     move(positions.loc['Pos0'], positions.loc['Pos1'], 60, 'low', '')
@@ -249,7 +139,8 @@ def createCB1DPath(animation):
     
     if animation:
         a = animate.AnimatedScatter(len(pathCB1D_df),pathCB1D_df,xfig,yfig,anchors_df.loc['CB1D'])
-    
+ 
+# creates path of simulation with noise: pov 8418 antenna
 def create8418Path(animation):
     stay(positions.loc['Pos0'], 20, 'hight', '')
     move(positions.loc['Pos0'], positions.loc['Pos1'], 60, 'hight', '')
@@ -279,7 +170,8 @@ def create8418Path(animation):
     
     if animation:
         a = animate.AnimatedScatter(len(path8418_df),path8418_df,xfig,yfig,anchors_df.loc['8418'])
-    
+
+# creates path of simulation with noise: pov D20C antenna    
 def createD20CPath(animation):
     stay(positions.loc['Pos0'], 20, 'low', 'top')
     move(positions.loc['Pos0'], positions.loc['Pos1'], 60, 'low', 'top')
@@ -309,7 +201,8 @@ def createD20CPath(animation):
     
     if animation:
         a = animate.AnimatedScatter(len(pathD20C_df),pathD20C_df,xfig,yfig,anchors_df.loc['D20C'])
-    
+ 
+# creates path of simulation with noise: pov 198A antenna
 def create198APath(animation):
     stay(positions.loc['Pos0'], 20, 'hight', '')
     move(positions.loc['Pos0'], positions.loc['Pos1'], 60, 'hight', '')
