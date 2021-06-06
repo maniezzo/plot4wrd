@@ -232,9 +232,69 @@ def create198APath(animation):
     
     if animation:
         a = animate.AnimatedScatter(len(path198A_df),path198A_df,xfig,yfig,anchors_df.loc['198A'])
+
+def create9028Path(animation):
+    stay(positions.loc['Pos0'], 20, 'low', '')
+    move(positions.loc['Pos0'], positions.loc['Pos1'], 60, 'low', '')
+    stay(positions.loc['Pos1'], 20, 'low', '')
+    move(positions.loc['Pos1'], positions.loc['Pos2'], 30, 'low2medium', '')
+    stay(positions.loc['Pos2'], 20, 'medium', '')
+    move(positions.loc['Pos2'], positions.loc['Pos1'], 30, 'medium2low', '')
+    move(positions.loc['Pos1'], positions.loc['Pos3'], 60, 'low2medium', '')
+    stay(positions.loc['Pos3'], 20, 'medium', '')
+    move(positions.loc['Pos3'], positions.loc['Pos4'], 30, 'medium', '')
+    stay(positions.loc['Pos4'], 20, 'medium', '')
+    move(positions.loc['Pos4'], positions.loc['Pos3'], 30, 'mediumR', '')
+    move(positions.loc['Pos3'], positions.loc['Pos5'], 120, 'medium2hight', '')
+    stay(positions.loc['Pos5'], 20, 'hight', '')
+    move(positions.loc['Pos5'], positions.loc['Pos6'], 30, 'hight', 'top-left')
+    stay(positions.loc['Pos6'], 20, 'hight', 'top-left')
+    move(positions.loc['Pos6'], positions.loc['Pos5'], 30, 'hightR', 'top-left')
+    move(positions.loc['Pos5'], positions.loc['Pos3'], 120, 'hight2medium', '')
+    move(positions.loc['Pos3'], positions.loc['Pos1'], 60, 'medium2low', '')
+    move(positions.loc['Pos1'], positions.loc['Pos0'], 60, 'low', '')
     
+    path9028_df = path_df
+    path9028_df['x'] = 5-path_df['x']
+    fig, ax = plt.subplots(figsize=(xfig, yfig))
+    plotStanza(xfig, yfig, anchors_df.loc['9028'], path9028_df, fig)
+    path9028_df.to_csv('UWB_9028_'+str(datetime.today().strftime('%y%m%d')).split()[0]+'.csv', encoding='utf-8')
+    
+    if animation:
+        a = animate.AnimatedScatter(len(path9028_df),path9028_df,xfig,yfig,anchors_df.loc['9028'])
+ 
+def createCC90Path(animation):
+    stay(positions.loc['Pos0'], 20, 'hight', '')
+    move(positions.loc['Pos0'], positions.loc['Pos1'], 60, 'hight', '')
+    stay(positions.loc['Pos1'], 20, 'hight', '')
+    move(positions.loc['Pos1'], positions.loc['Pos2'], 30, 'hight2medium', '')
+    stay(positions.loc['Pos2'], 20, 'medium', '')
+    move(positions.loc['Pos2'], positions.loc['Pos1'], 30, 'medium2hight', '')
+    move(positions.loc['Pos1'], positions.loc['Pos3'], 60, 'hight2medium', '')
+    stay(positions.loc['Pos3'], 20, 'low', '')
+    move(positions.loc['Pos3'], positions.loc['Pos4'], 30, 'low2medium', '')
+    stay(positions.loc['Pos4'], 20, 'medium', '')
+    move(positions.loc['Pos4'], positions.loc['Pos3'], 30, 'medium2low', '')
+    move(positions.loc['Pos3'], positions.loc['Pos5'], 120, 'low', '')
+    stay(positions.loc['Pos5'], 20, 'low', '')
+    move(positions.loc['Pos5'], positions.loc['Pos6'], 30, 'low2medium', '')
+    stay(positions.loc['Pos6'], 20, 'medium', '')
+    move(positions.loc['Pos6'], positions.loc['Pos5'], 30, 'medium2low', '')
+    move(positions.loc['Pos5'], positions.loc['Pos3'], 120, 'low', '')
+    move(positions.loc['Pos3'], positions.loc['Pos1'], 60, 'medium2hight', '')
+    move(positions.loc['Pos1'], positions.loc['Pos0'], 60, 'hight', '')
+    
+    pathCC90_df = path_df
+    pathCC90_df['x'] = 5-path_df['x']
+    fig, ax = plt.subplots(figsize=(xfig, yfig))
+    plotStanza(xfig, yfig, anchors_df.loc['CC90'], pathCC90_df, fig)
+    pathCC90_df.to_csv('UWB_CC90_'+str(datetime.today().strftime('%y%m%d')).split()[0]+'.csv', encoding='utf-8')
+    
+    if animation:
+        a = animate.AnimatedScatter(len(pathCC90_df),pathCC90_df,xfig,yfig,anchors_df.loc['CC90'])
+        
 def main():  
-    global anchors_df, positions, path_df, pathCB1D_df, path8418_df, pathD20C_df, xfig, yfig
+    global anchors_df, positions, path_df, pathCB1D_df, path8418_df, pathD20C_df, path9028_df, pathCC90_df, xfig, yfig
     
     xfig = 16.9      # room length
     yfig = 5          # room width
@@ -257,7 +317,10 @@ def main():
     createD20CPath(False)
     path_df = pd.DataFrame(columns=['time', 'tagID', 'x', 'y', 'z', 'quality'])
     create198APath(False)  
-
+    path_df = pd.DataFrame(columns=['time', 'tagID', 'x', 'y', 'z', 'quality'])
+    create9028Path(False)
+    path_df = pd.DataFrame(columns=['time', 'tagID', 'x', 'y', 'z', 'quality'])
+    createCC90Path(False)
     
 # Program entry point
 if __name__ == "__main__":
