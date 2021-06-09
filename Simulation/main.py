@@ -293,14 +293,48 @@ def createCC90Path(animation):
     if animation:
         a = animate.AnimatedScatter(len(pathCC90_df),pathCC90_df,xfig,yfig,anchors_df.loc['CC90'])
         
+def createCV1Path(animation):
+    stay(positions.loc['Pos0'], 20, 'medium', '')
+    move(positions.loc['Pos0'], positions.loc['Pos1'], 60, 'medium2low', '')
+    stay(positions.loc['Pos1'], 20, 'low', '')
+    move(positions.loc['Pos1'], positions.loc['Pos2'], 30, 'medium2hight', '')
+    stay(positions.loc['Pos2'], 20, 'hight', '')
+    move(positions.loc['Pos2'], positions.loc['Pos1'], 30, 'hight2medium', '')
+    move(positions.loc['Pos1'], positions.loc['Pos3'], 60, 'low', '')
+    stay(positions.loc['Pos3'], 20, 'low', '')
+    move(positions.loc['Pos3'], positions.loc['Pos4'], 30, 'low2medium', '')
+    stay(positions.loc['Pos4'], 20, 'medium', '')
+    move(positions.loc['Pos4'], positions.loc['Pos3'], 30, 'medium2low', '')
+    move(positions.loc['Pos3'], positions.loc['Pos5'], 120, 'low', '')
+    stay(positions.loc['Pos5'], 20, 'low', '')
+    move(positions.loc['Pos5'], positions.loc['Pos6'], 30, 'low', '')
+    stay(positions.loc['Pos6'], 20, 'low', '')
+    move(positions.loc['Pos6'], positions.loc['Pos5'], 30, 'low', '')
+    move(positions.loc['Pos5'], positions.loc['Pos3'], 120, 'low', '')
+    move(positions.loc['Pos3'], positions.loc['Pos1'], 60, 'low', '')
+    move(positions.loc['Pos1'], positions.loc['Pos0'], 60, 'low2medium', '')
+    
+    pathCV1_df = path_df
+    pathCV1_df['x'] = 5-path_df['x']
+    fig, ax = plt.subplots(figsize=(xfig, yfig))
+    plotStanza(xfig, yfig, cameras_df.loc['CV1'], pathCV1_df, fig)
+    pathCV1_df.to_csv('CV_CV1_'+str(datetime.today().strftime('%y%m%d')).split()[0]+'.csv', encoding='utf-8')
+    
+    if animation:
+        a = animate.AnimatedScatter(len(pathCV1_df),pathCV1_df,xfig,yfig,anchors_df.loc['CV'])
+        
 def main():  
-    global anchors_df, positions, path_df, pathCB1D_df, path8418_df, pathD20C_df, path9028_df, pathCC90_df, xfig, yfig
+    global anchors_df, cameras_df, positions, path_df, pathCB1D_df, path8418_df, pathD20C_df, path9028_df, pathCC90_df, pathCV1_df, xfig, yfig
     
     xfig = 16.9      # room length
     yfig = 5          # room width
     
     anchors_df = pd.DataFrame(np.array([[0, 12.1], [0, 4.6], [2.5, 0], [4.95, 4.6], [4.95, 12.1], [2.5, 16.9]]),
                               index=['CC90','D20C','CB1D','9028','198A','8418'],
+                              columns=['x', 'y'])
+    
+    cameras_df = pd.DataFrame(np.array([[2.35, 10.5]]),
+                              index=['CV1'],
                               columns=['x', 'y'])
     
     positions = pd.DataFrame(np.array([[2.5, 4.2, 0], [2.50, 6.66, 0], [3.95, 6.66, 0], [2.50, 9.06, 0], [1.00, 9.06, 0], [2.50, 13.00, 0], [1.00, 13.00, 0]]),
@@ -321,6 +355,8 @@ def main():
     create9028Path(False)
     path_df = pd.DataFrame(columns=['time', 'tagID', 'x', 'y', 'z', 'quality'])
     createCC90Path(False)
+    path_df = pd.DataFrame(columns=['time', 'tagID', 'x', 'y', 'z', 'quality'])
+    createCV1Path(False)
     
 # Program entry point
 if __name__ == "__main__":

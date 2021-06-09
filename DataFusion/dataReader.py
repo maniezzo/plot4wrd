@@ -54,6 +54,19 @@ def parse_csv_data(path):
 def parse_table_data2(anchorcoord):
    global df
    
+   cv = parse_csv_data('Simulation//CV_CV1_210609.csv')
+   df_cv = pd.DataFrame(columns=['time','x','y'])
+   df_cv['time'] = cv['time']
+   df_cv['x'] = cv['x']
+   df_cv['y'] = cv['y']
+   df_cv = df_cv.set_index('time')
+   real = parse_csv_data('Simulation//UWB_NoNOISE_210609.csv')
+   df_real = pd.DataFrame(columns=['time','x','y'])
+   df_real['time'] = real['time']
+   df_real['x'] = real['x']
+   df_real['y'] = real['y']
+   df_real = df_real.set_index('time')
+   
    df = pd.DataFrame(columns=['time', 'tagID', 'x', 'y', 'z', 'quality','n_dist', 'anchorID_1', 'dist_1', 'anchorID_2', 'dist_2', 'anchorID_3', 'dist_3', 'anchorID_4', 'dist_4', 'anchorID_5', 'dist_5', 'anchorID_6', 'dist_6'])
    df['x'] = 0
    df['y'] = 0
@@ -62,13 +75,14 @@ def parse_table_data2(anchorcoord):
    
    anchornames = list(anchorcoord.keys())
    for i in range(len(anchornames)):
-       df_antenna = parse_csv_data('Simulation//UWB_'+anchornames[i]+'_210604.csv')
+       df_antenna = parse_csv_data('Simulation//UWB_'+anchornames[i]+'_210609.csv')
        df['time'] = df_antenna['time']
        df['tagID'] = df_antenna['tagID']
        df['quality'] = df_antenna['quality']
        df['anchorID_'+str(i+1)] = anchornames[i]
        df['dist_'+str(i+1)] = np.sqrt((anchorcoord[anchornames[i]][0] - df_antenna['x'])**2 + (anchorcoord[anchornames[i]][1] - df_antenna['y'])**2)
-       
+    
+   df = df.set_index('time')
    prep = preprocessor.Preproc()
    window=7
    # for attr in ['dist_1','dist_2','dist_3','dist_4','dist_5']:
@@ -83,7 +97,7 @@ def parse_table_data2(anchorcoord):
    #get ordered anchor data
    define_anchor_columns()
    # init_df()                          
-   return 
+   return df_cv, df_real
 
 # from db to distances
 def getDistances(d0):
