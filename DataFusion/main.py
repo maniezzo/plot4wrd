@@ -140,13 +140,28 @@ if __name__ == "__main__":
    yfig = 5          # room width
    
    df_uwb_cv = pd.concat([points['x'], points['y'], df_cv['x'], df_cv['y'], df_real['x'], df_real['y']], axis=1, keys=['x_uwb', 'y_uwb', 'x_cv', 'y_cv','x','y'])
-     
+   
+   #df_uwb_cv = df_uwb_cv.fillna(value=None, method='backfill', axis=None, limit=None, downcast=None)
+   # df_uwb_cv = df_uwb_cv.interpolate(method='linear')
+   #df_uwb_cv = df_uwb_cv.ffill()  
    # Plot uwb path
    plotPath(df_uwb_cv.x_uwb, df_uwb_cv.y_uwb)
    #plot cv path
    plotPath(df_uwb_cv.x_cv, df_uwb_cv.y_cv)
    # Plot real path
    plotPath(df_uwb_cv.x, df_uwb_cv.y)
+   
+   df_uwb_cv.x_cv = df_uwb_cv.apply(
+     lambda row: row['x_uwb'] if np.isnan(row['x_cv']) else row['x_cv'], 
+     axis=1
+   )
+   df_uwb_cv.y_cv = df_uwb_cv.apply(
+     lambda row: row['y_uwb'] if np.isnan(row['y_cv']) else row['y_cv'], 
+     axis=1
+   )
+   # df_uwb_cv = df_uwb_cv.interpolate(method='linear')
+   plotPath(df_uwb_cv.x_cv, df_uwb_cv.y_cv)
+   # Plot real path
    
    dataset = df_uwb_cv.values
    

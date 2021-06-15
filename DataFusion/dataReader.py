@@ -54,13 +54,13 @@ def parse_csv_data(path):
 def parse_table_data2(anchorcoord):
    global df
    
-   cv = parse_csv_data('Simulation//CV_CV1_210609.csv')
+   cv = parse_csv_data('Simulation//CV_CV2_210615.csv')
    df_cv = pd.DataFrame(columns=['time','x','y'])
    df_cv['time'] = cv['time']
    df_cv['x'] = cv['x']
    df_cv['y'] = cv['y']
    df_cv = df_cv.set_index('time')
-   real = parse_csv_data('Simulation//UWB_NoNOISE_210609.csv')
+   real = parse_csv_data('Simulation//UWB_NoNOISE_210615.csv')
    df_real = pd.DataFrame(columns=['time','x','y'])
    df_real['time'] = real['time']
    df_real['x'] = real['x']
@@ -75,7 +75,7 @@ def parse_table_data2(anchorcoord):
    
    anchornames = list(anchorcoord.keys())
    for i in range(len(anchornames)):
-       df_antenna = parse_csv_data('Simulation//UWB_'+anchornames[i]+'_210609.csv')
+       df_antenna = parse_csv_data('Simulation//UWB_'+anchornames[i]+'_210615.csv')
        df['time'] = df_antenna['time']
        df['tagID'] = df_antenna['tagID']
        df['quality'] = df_antenna['quality']
